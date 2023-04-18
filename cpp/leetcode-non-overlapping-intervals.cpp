@@ -1,3 +1,4 @@
+// https://leetcode.cn/problems/non-overlapping-intervals
 /*
 经典贪心：右值排序
 sort(a,[](l, r) { return l.r < r.r; })

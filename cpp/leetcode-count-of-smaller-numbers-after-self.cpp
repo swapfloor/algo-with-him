@@ -74,3 +74,68 @@ public:
         return cnt;
     }
 };
+
+
+/*----------离散化树状数组模板-----------*/
+using i64 = long long;
+namespace treetree{
+template<class T>
+struct Discretization {
+    int n;
+    std::vector<int> a;
+    Discretization(std::vector<T>& b) {
+        a = b;
+        sort(a.begin(), a.end());
+        a.erase(unique(a.begin(), a.end()), a.end());
+        n = a.size();
+    }
+    int operator[](T v) {
+        auto it = std::lower_bound(a.begin(), a.end(), v);
+        assert(it != a.end() && *it == v);
+        return it - a.begin(); // return pos [0, n)
+    }
+    int size() const { return n; }
+};
+}
+namespace treetree{
+template<class T>
+struct Fenwick {
+    int n;
+    std::vector<int> a;
+    Fenwick(int n) : n(n), a(n + 1) {}
+    void add(int p, T v) { // add(pos, val)
+        assert(1 <= p && p <= n);
+        while (p <= n) {
+            a[p] += v;
+            p += p & -p;
+        }
+    }
+    T query(int p) { // sum[1,...,p]
+        assert(0 <= p && p <= n);
+        T ans = 0;
+        while (p > 0) {
+            ans += a[p];
+            p -= p & -p;
+        }
+        return ans;
+    }
+    T rangeQuery(int l, int r) {
+        return query(r) - query(l - 1);
+    }
+};
+}
+class Solution {
+public:
+    vector<int> countSmaller(vector<int>& nums) {
+        treetree::Discretization idx(nums);
+        treetree::Fenwick<int> tr(idx.size());
+        int n = nums.size();
+        vector<int> ans(n);
+        for (int i = n - 1; i >= 0; i--) {
+            int p = idx[nums[i]] + 1;
+            ans[i] = tr.query(p - 1);
+            tr.add(p, 1);
+        }
+        return ans;
+    }
+};

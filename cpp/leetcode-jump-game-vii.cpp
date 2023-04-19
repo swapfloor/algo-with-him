@@ -1,5 +1,6 @@
 // slide window 
 // 可以想向成一个队列，不在队列就剔除
+// https://leetcode.com/problems/jump-game-vii/
 class Solution {
 public:
     bool canReach(string s, int minJump, int maxJump) {

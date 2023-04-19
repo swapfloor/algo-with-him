@@ -1,4 +1,5 @@
 // 二分搜索
+// https://leetcode.cn/problems/find-right-intervals
 class Solution {
 public:
     vector<int> findRightInterval(vector<vector<int>>& intervals) {

@@ -10,21 +10,50 @@ namespace treetree{
 struct TarjanScc {
     int n;
     int timeStamp;
+    bool isWork;
     std::vector<std::vector<int>> g;
     std::vector<std::vector<int>> topoG;
+    std::vector<int> din, dout;
     std::vector<int> dfn, low;
     std::vector<int> stk;
     std::vector<int> inStk;
-    std::vector<int> id, size={0};
+    std::vector<int> id, size;
     int sccCnt;
-    TarjanScc(int n) : n(n), g(n), dfn(n), low(n), inStk(n), id(n), sccCnt(0), timeStamp(0) {}
+    TarjanScc(int n) : n(n), g(n), dfn(n), low(n), inStk(n), id(n), sccCnt(0), timeStamp(0), isWork(false) {}
     void addEdge(int from,int to){
         assert(from>=0&&from<n&&to>=0&&to<n);
         g[from].emplace_back(to);
     }
     void work() {
+        isWork = true;
         for (int i = 0; i < n; i++) {
             if (!dfn[i]) tarjanWork(i);
+        }
+    }
+    void buildTopoDin() {
+        assert(isWork);
+        assert(sccCnt > 0);
+        din = std::vector<int>(sccCnt);
+        for (int u = 0; u < n; u++) {
+            for (auto v : g[u]) {
+                int a = id[u], b = id[v];
+                if (a != b) {
+                    din[b]++;
+                }
+            }
+        }
+    }
+    void buildTopoDout() {
+        assert(isWork);
+        assert(sccCnt > 0);
+        dout = std::vector<int>(sccCnt);
+        for (int u = 0; u < n; u++) {
+            for (auto v : g[u]) {
+                int a = id[u], b = id[v];
+                if (a != b) {
+                    dout[a]++;
+                }
+            }
         }
     }
     void buildTopoGraph() {
@@ -54,7 +83,6 @@ private:
         }
 
         if (dfn[x] == low[x]) {
-            sccCnt++;
             size.push_back(0);
             int y;
             do {
@@ -64,6 +92,7 @@ private:
                 id[y] = sccCnt;
                 size[sccCnt]++;
             } while (y != x);
+            sccCnt++;
         }
     }
 };
@@ -80,20 +109,12 @@ int main() {
         }
     }
     tarjan.work();
-    vector<int> din(tarjan.sccCnt + 1), dout(tarjan.sccCnt + 1);
-    for (int u = 0; u < n; u++) {
-        for (auto v : tarjan.g[u]) {
-            int a = tarjan.id[u], b = tarjan.id[v];
-            if (a != b) {
-                din[b]++;
-                dout[a]++;
-            }
-        }
-    }
+    tarjan.buildTopoDin();
+    tarjan.buildTopoDout();
     int a = 0, b = 0;
-    for (int i = 1; i <= tarjan.sccCnt; i++) {
-        if (!din[i]) a++;
-        if (!dout[i]) b++;
+    for (int i = 0; i < tarjan.sccCnt; i++) {
+        if (!tarjan.din[i]) a++;
+        if (!tarjan.dout[i]) b++;
     }
     cout << a << "\n";
     if (tarjan.sccCnt == 1) {

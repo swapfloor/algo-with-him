@@ -17,7 +17,7 @@ int main(){
             cout << 0 << "\n";
             continue;
         }
-        long long mi = 1LL << 35;
+        long long mi = 1LL << 40;
         long long ans = 0;
         long long bin = n / 2;
         constexpr long long mod = 1e9 + 7;
